@@ -258,10 +258,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Firebase Dependencies Installation"
-    - "Firebase Configuration"  
-    - "Authentication Context"
-    - "Sign-in/Sign-up Page"
+    - "Courses and Testing System"
+    - "Video Room System"
+    - "Resume Builder"
+    - "Profile Management"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
