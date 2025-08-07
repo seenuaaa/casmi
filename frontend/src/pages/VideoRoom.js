@@ -250,7 +250,7 @@ const VideoRoom = () => {
                 {isVideoEnabled ? (
                   <VideoCameraIcon className="w-6 h-6" />
                 ) : (
-                  <VideoCameraSlashIcon className="w-6 h-6" />
+                  <VideoCameraOffIcon className="w-6 h-6" />
                 )}
               </button>
 
