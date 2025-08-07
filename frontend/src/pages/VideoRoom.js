@@ -176,7 +176,7 @@ const VideoRoom = () => {
                 <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <VideoCameraSlashIcon className="w-8 h-8 text-gray-400" />
+                      <VideoCameraOffIcon className="w-8 h-8 text-gray-400" />
                     </div>
                     <p className="text-white font-medium">You (Camera Off)</p>
                   </div>
