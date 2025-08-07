@@ -3,17 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { db, joinRoom } from '../firebase';
 import { doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
-import { 
+import {
   VideoCameraIcon,
   MicrophoneIcon,
   PhoneXMarkIcon,
   ChatBubbleLeftEllipsisIcon,
-  ComputerDesktopIcon
+  ComputerDesktopIcon,
+  VideoCameraSlashIcon as VideoCameraOffIcon,
+  SpeakerXMarkIcon as MicrophoneOffIcon
 } from '@heroicons/react/24/outline';
-import {
-  VideoCameraSlashIcon,
-  MicrophoneSlashIcon
-} from '@heroicons/react/24/solid';
 
 const VideoRoom = () => {
   const { roomId } = useParams();
