@@ -235,7 +235,7 @@ const VideoRoom = () => {
                 {isAudioEnabled ? (
                   <MicrophoneIcon className="w-6 h-6" />
                 ) : (
-                  <MicrophoneSlashIcon className="w-6 h-6" />
+                  <MicrophoneOffIcon className="w-6 h-6" />
                 )}
               </button>
 
