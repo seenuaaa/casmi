@@ -102,40 +102,49 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Build Cosmivity - a full-stack app with Firebase backend including authentication (email/password + Google), video chat rooms with WebRTC, resume builder with PDF generation, course testing system, and user profiles. Using React frontend with TailwindCSS + 21st.dev components."
+user_problem_statement: "Enhance Cosmivity to be a real-time communication platform with React frontend, Node.js backend, Firebase database. Features needed: Left sidebar navigation, real-time public/private rooms (like Google Meet/Teams), professional portfolio profiles with skills, proper room access controls, and live video/chat functionality."
 
 backend:
-  - task: "Firebase Setup and Configuration"
+  - task: "Node.js Backend Setup (Replace FastAPI)"
     implemented: false
     working: "NA"
-    file: "firebase config"
+    file: "backend/server.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history: []
   
-  - task: "Firebase Authentication (Email/Password)"
+  - task: "Firebase Admin SDK Integration"
     implemented: false
     working: "NA" 
-    file: "auth service"
+    file: "backend/firebase-admin.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history: []
     
-  - task: "Firebase Google Authentication" 
+  - task: "Real-time Room API Endpoints" 
     implemented: false
     working: "NA"
-    file: "auth service"
+    file: "backend/routes/rooms.js"
     stuck_count: 0
     priority: "high" 
     needs_retesting: false
     status_history: []
 
-  - task: "Firestore Database Setup"
+  - task: "Socket.io Setup for Real-time Communication"
     implemented: false
     working: "NA"
-    file: "firestore service"
+    file: "backend/socket/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history: []
+
+  - task: "User Profile API with Skills Management"
+    implemented: false
+    working: "NA"
+    file: "backend/routes/users.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
