@@ -222,14 +222,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Courses and Testing System"
-    - "Video Room System"
-    - "Resume Builder"
-    - "Profile Management"
+    - "Node.js Backend Setup (Replace FastAPI)"
+    - "Firebase Admin SDK Integration"
+    - "Left Sidebar Navigation"
+    - "Real-time Room System with Firebase Integration"
+    - "Public/Private Room Creation and Access Control"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Cosmivity MVP completed! Implemented Firebase authentication (email/password + Google), complete course testing system, video rooms infrastructure, resume builder with all templates, and user profile management. All pages created with TailwindCSS styling and Syne font. Ready for testing."
+    message: "Starting major refactor: Replacing FastAPI backend with Node.js, implementing left sidebar navigation, and building real-time room system with proper Firebase integration. Focus on real-time communication features like Google Meet/Teams."
