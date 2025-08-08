@@ -1,133 +1,206 @@
 const admin = require('firebase-admin');
 
-// Mock Firestore for testing when Firebase is not available
-class MockFirestore {
-  constructor() {
-    this.collections = new Map();
-  }
-
-  collection(name) {
-    if (!this.collections.has(name)) {
-      this.collections.set(name, new MockCollection());
-    }
-    return this.collections.get(name);
-  }
-}
-
-class MockCollection {
-  constructor() {
-    this.docs = new Map();
-    this.queryConstraints = [];
-  }
-
-  where(field, operator, value) {
-    const newCollection = new MockCollection();
-    newCollection.docs = this.docs;
-    newCollection.queryConstraints = [...this.queryConstraints, { field, operator, value }];
-    return newCollection;
-  }
-
-  orderBy(field, direction = 'asc') {
-    const newCollection = new MockCollection();
-    newCollection.docs = this.docs;
-    newCollection.queryConstraints = [...this.queryConstraints, { type: 'orderBy', field, direction }];
-    return newCollection;
-  }
-
-  limit(count) {
-    const newCollection = new MockCollection();
-    newCollection.docs = this.docs;
-    newCollection.queryConstraints = [...this.queryConstraints, { type: 'limit', count }];
-    return newCollection;
-  }
-
-  async get() {
-    // Return empty results for mock
-    return {
-      empty: true,
-      docs: [],
-      forEach: () => {}
-    };
-  }
-
-  doc(id) {
-    return new MockDocument(id);
-  }
-
-  async add(data) {
-    const id = 'mock-' + Date.now();
-    return { id };
-  }
-}
-
-class MockDocument {
-  constructor(id) {
-    this.id = id;
-  }
-
-  async get() {
-    return {
-      exists: false,
-      id: this.id,
-      data: () => null
-    };
-  }
-
-  async set(data) {
-    return { writeTime: new Date() };
-  }
-
-  async update(data) {
-    return { writeTime: new Date() };
-  }
-}
-
-// Initialize Firebase Admin SDK
+// Initialize Firebase Admin SDK with project-only approach for development
 let db, auth;
 let isFirebaseAvailable = false;
 
 if (!admin.apps.length) {
   try {
-    // In production, you would use a service account key file
-    // For development/testing, we'll use a mock setup if credentials fail
+    // Simple project-based initialization for Firebase
     admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      projectId: process.env.FIREBASE_PROJECT_ID || 'cosmivity'
+      projectId: process.env.FIREBASE_PROJECT_ID || 'cosmivity',
+      // Use the Firebase project without authentication for basic operations
     });
-    console.log('🔥 Firebase Admin initialized successfully');
-    isFirebaseAvailable = true;
-  } catch (error) {
-    console.warn('⚠️ Firebase Admin initialization failed, using mock setup for testing:', error.message);
-    // Fallback initialization for development/testing
-    try {
-      admin.initializeApp({
-        projectId: process.env.FIREBASE_PROJECT_ID || 'cosmivity'
-      });
-      console.log('🔥 Firebase Admin initialized with basic config');
-      isFirebaseAvailable = true;
-    } catch (fallbackError) {
-      console.error('❌ Firebase Admin fallback initialization failed, using mock Firestore:', fallbackError.message);
-      isFirebaseAvailable = false;
-    }
-  }
-}
-
-// Set up db and auth
-if (isFirebaseAvailable) {
-  try {
+    
+    console.log('🔥 Firebase Admin initialized with project ID');
+    
+    // Try to access Firestore
     db = admin.firestore();
     auth = admin.auth();
-    console.log('✅ Firebase Firestore and Auth initialized');
+    
+    // Test Firestore connection
+    db.collection('test').limit(1).get()
+      .then(() => {
+        console.log('✅ Firestore connection successful');
+        isFirebaseAvailable = true;
+      })
+      .catch(error => {
+        console.warn('⚠️ Firestore connection failed, using read-only mode:', error.message);
+        // Keep db reference but mark as limited functionality
+        isFirebaseAvailable = false;
+      });
+      
   } catch (error) {
-    console.warn('⚠️ Firebase services not available, using mock implementations');
-    db = new MockFirestore();
+    console.error('❌ Firebase initialization failed:', error.message);
+    
+    // Create mock implementations for development
+    console.log('🧪 Creating mock Firebase services for development');
+    
+    db = createMockFirestore();
     auth = null;
     isFirebaseAvailable = false;
   }
 } else {
-  console.log('🧪 Using mock Firestore for testing');
-  db = new MockFirestore();
-  auth = null;
+  // Use existing app
+  const app = admin.app();
+  db = admin.firestore();
+  auth = admin.auth();
+  isFirebaseAvailable = true;
+}
+
+// Mock Firestore implementation for development
+function createMockFirestore() {
+  const mockData = {
+    rooms: [
+      {
+        id: 'mock-room-1',
+        name: 'Development Test Room',
+        description: 'A test room for development',
+        isPrivate: false,
+        isActive: true,
+        hostId: 'mock-user-1',
+        hostName: 'Test User',
+        maxParticipants: 10,
+        participants: [],
+        createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date()
+      },
+      {
+        id: 'mock-room-2',
+        name: 'Private Meeting Room',
+        description: 'A private test room',
+        isPrivate: true,
+        isActive: true,
+        hostId: 'mock-user-2',
+        hostName: 'Another User',
+        accessCode: 'ABC123',
+        maxParticipants: 6,
+        participants: [{
+          userId: 'mock-user-3',
+          name: 'Participant',
+          joinedAt: new Date()
+        }],
+        createdAt: new Date('2025-01-02T00:00:00.000Z'),
+        updatedAt: new Date()
+      }
+    ],
+    users: [
+      {
+        uid: 'mock-user-1',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        photoURL: '',
+        bio: 'A test user for development',
+        skills: ['JavaScript', 'React', 'Node.js'],
+        preferences: { isProfilePublic: true, allowMessages: true },
+        createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date()
+      }
+    ]
+  };
+
+  return {
+    collection: (name) => ({
+      where: (field, operator, value) => ({
+        where: () => ({ where: () => ({ orderBy: () => ({ limit: () => ({
+          get: async () => {
+            let results = mockData[name] || [];
+            // Simple filtering for mock data
+            if (field === 'isPrivate' && value === false) {
+              results = results.filter(item => !item.isPrivate);
+            }
+            if (field === 'isActive' && value === true) {
+              results = results.filter(item => item.isActive);
+            }
+            return {
+              empty: results.length === 0,
+              docs: results.map(item => ({
+                id: item.id || 'mock-id',
+                data: () => item,
+                exists: true
+              })),
+              forEach: (callback) => {
+                results.forEach((item, index) => {
+                  callback({
+                    id: item.id || `mock-id-${index}`,
+                    data: () => item
+                  });
+                });
+              }
+            };
+          }
+        })})})})
+      }),
+      orderBy: () => ({
+        limit: (count) => ({
+          get: async () => {
+            const results = mockData[name] || [];
+            return {
+              empty: results.length === 0,
+              docs: results.slice(0, count).map(item => ({
+                id: item.id || 'mock-id',
+                data: () => item,
+                exists: true
+              })),
+              forEach: (callback) => {
+                results.slice(0, count).forEach((item, index) => {
+                  callback({
+                    id: item.id || `mock-id-${index}`,
+                    data: () => item
+                  });
+                });
+              }
+            };
+          }
+        })
+      }),
+      limit: (count) => ({
+        get: async () => {
+          const results = mockData[name] || [];
+          return {
+            empty: results.length === 0,
+            docs: results.slice(0, count).map(item => ({
+              id: item.id || 'mock-id',
+              data: () => item,
+              exists: true
+            })),
+            forEach: (callback) => {
+              results.slice(0, count).forEach((item, index) => {
+                callback({
+                  id: item.id || `mock-id-${index}`,
+                  data: () => item
+                });
+              });
+            }
+          };
+        }
+      }),
+      doc: (id) => ({
+        get: async () => {
+          const items = mockData[name] || [];
+          const item = items.find(i => i.id === id || i.uid === id);
+          return {
+            exists: !!item,
+            id,
+            data: () => item || null
+          };
+        },
+        set: async (data) => {
+          console.log(`Mock set operation on ${name}/${id}:`, data);
+          return { writeTime: new Date() };
+        },
+        update: async (data) => {
+          console.log(`Mock update operation on ${name}/${id}:`, data);
+          return { writeTime: new Date() };
+        }
+      }),
+      add: async (data) => {
+        const id = `mock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log(`Mock add operation on ${name}:`, data);
+        return { id };
+      }
+    })
+  };
 }
 
 module.exports = { admin, db, auth, isFirebaseAvailable };
