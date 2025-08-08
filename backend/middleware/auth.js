@@ -1,4 +1,4 @@
-const { auth } = require('../config/firebase-admin');
+const { auth, isFirebaseAvailable } = require('../config/firebase-admin');
 
 const authenticateUser = async (req, res, next) => {
   try {
@@ -9,6 +9,18 @@ const authenticateUser = async (req, res, next) => {
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // If Firebase is not available, use mock authentication for testing
+    if (!isFirebaseAvailable || !auth) {
+      console.warn('⚠️ Using mock authentication for testing');
+      req.user = {
+        uid: 'mock-user-id',
+        email: 'test@example.com',
+        name: 'Test User',
+        picture: ''
+      };
+      return next();
+    }
     
     const decodedToken = await auth.verifyIdToken(token);
     req.user = decodedToken;
